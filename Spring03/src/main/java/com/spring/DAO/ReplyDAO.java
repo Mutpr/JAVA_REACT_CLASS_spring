@@ -1,10 +1,11 @@
 package com.spring.DAO;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.spring.DTO.ReplyDTO;
@@ -13,26 +14,28 @@ import com.spring.DTO.ReplyDTO;
 public class ReplyDAO {
 	
 	@Autowired
-	private JdbcTemplate jdbc;
+	private SqlSession session;
 	
 	public List<ReplyDTO> getAllReply(int postSeq){
-		String getAllReplySQL = "select * from reply where post_seq=?";
-		return jdbc.query(getAllReplySQL, new BeanPropertyRowMapper<>(ReplyDTO.class), postSeq);
+		List<ReplyDTO> replyList = session.selectList("reply.getAllReply");
+		return replyList;
 	}
-	public int insertReply(ReplyDTO reply, int userSeq, int postSeq) {
-		System.out.println(userSeq);
-		System.out.println(postSeq);
-		String insertReplySQL = "insert into reply values(reply_seq.nextval, ?, ?, sysdate, ?)";
-		return jdbc.update(insertReplySQL, reply.getContents(), userSeq, postSeq);
+	public int insertReply(ReplyDTO reply, int writer_seq, int post_seq) {
+		Map<String, Object> paramList = new HashMap<>();
+		paramList.put("contents", reply.getContents());
+		paramList.put("writer_seq", writer_seq);
+		paramList.put("post_seq", post_seq);
+		return session.insert("reply.insertReply",paramList);
 	}
 	
 	public void updateReply(ReplyDTO reply) {
-	    String updateReplySQL = "update reply set contents = ? where seq=?";
-	    jdbc.update(updateReplySQL, reply.getContents(), reply.getSeq());
+		Map<String, Object> paramList = new HashMap<>();
+		paramList.put("contents", reply.getContents());
+		paramList.put("seq", reply.getSeq());
+		session.update("reply.updateReply", paramList);
 	}
 	
 	public void deleteReply(int replySeq) {
-		String deleteReplySQL = "delete reply where seq = ?";
-		jdbc.update(deleteReplySQL, replySeq);
+		session.delete("reply.deleteReply", replySeq);
 	}
 }

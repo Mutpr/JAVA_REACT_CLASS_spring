@@ -10,6 +10,12 @@ public class MemberDTO {
 		super();
 	}
 	
+	public MemberDTO(int id, String username, String password, String name) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.name = name;
+	}
 	public MemberDTO(String username, String password, String name) {
 		this.username = username;
 		this.password = password;

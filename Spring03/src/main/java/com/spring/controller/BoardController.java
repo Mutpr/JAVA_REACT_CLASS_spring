@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,7 @@ public class BoardController {
 
 	@Autowired
 	private FileService fileService;
-	
+
 	@Autowired
 	private FileDAO fileDAO;
 
@@ -48,19 +49,30 @@ public class BoardController {
 		return "board/main";
 	}
 
+	@Transactional
 	@RequestMapping("writeBoard")
 	public String writeBoard(BoardDTO board, MultipartFile[] file) throws Exception {
 		MemberDTO member = (MemberDTO) session.getAttribute("loginResult");
 		String realPath = session.getServletContext().getRealPath("upload");
+
 		System.out.println("realPath: " + realPath);
 		System.out.println(member.getId());
+		board.setWriter_seq(member.getId());
+		System.out.println("writer: " + board.getWriter_seq());
 
-		int parentSeq = dao.insertBoard(board, member);
-		System.out.println("parentSeq: "+parentSeq);
-		for (MultipartFile files : file) {
-			fileService.upload(realPath, files, parentSeq);
+		int parentSeq = dao.insertBoard(board);
+
+		System.out.println("parentSeq: " + parentSeq);
+
+		if (parentSeq > 0) {
+			for (MultipartFile files : file) {
+				fileService.upload(realPath, files, parentSeq);
+			}
+			return "redirect:/board/main";
+		} else {
+			return "redirect:/board/main";
 		}
-		return "redirect:/board/main";
+
 	}
 
 	@RequestMapping("showOnePost")

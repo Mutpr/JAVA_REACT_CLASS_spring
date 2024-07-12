@@ -5,6 +5,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.spring.DAO.MemberDAO;
@@ -27,10 +28,10 @@ public class MemberController {
 
 	@ResponseBody
 	@RequestMapping(value = "idCheck", produces = "text/html; charset=utf-8")
-	public String idCheck(String id) throws Exception {
-		boolean result = dao.isIdExist(id);
+	public void idCheck(@RequestParam("id") String username) throws Exception {
+		System.out.println(username);
+		int result = dao.isIdExist(username);
 		System.out.println(result);
-		return String.valueOf(result);
 	}
 
 	@RequestMapping("signupPage")
@@ -41,7 +42,7 @@ public class MemberController {
 	@RequestMapping("signup")
 	public String signup(MemberDTO member) throws Exception {
 		System.out.println(member.getName());
-		dao.insert(member);
+		dao.insertMember(member);
 		return "redirect:/";
 	}
 	
@@ -53,8 +54,8 @@ public class MemberController {
 	@RequestMapping("login")
 	public String loginUser(String username, String password) throws Exception {
 		System.out.println("username:"+username);
-		MemberDTO member = new MemberDTO(username, password);
-		MemberDTO loginResult = dao.loginUser(member);
+		System.out.println("password:"+password);
+		MemberDTO loginResult = dao.loginUser(username, password);
 		session.setAttribute("loginResult", loginResult);
 		
 		return "redirect:/";

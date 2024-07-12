@@ -1,4 +1,4 @@
-package com.spring.controller;
+package com.kedu.controller;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HomeController {
 	@RequestMapping("/")
-	public String home(Locale locale, Model model) {
+	public String home() {
 		return "home";
 	}
 	
